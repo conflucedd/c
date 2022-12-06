@@ -4,7 +4,7 @@
 void clean_input(void);
 void exist(char * laterword, char (*wordlist)[20], int word_num, int wordlist_loc[], bool result[]);
 
-int main(void)
+int main(void)vdfdfvdf
 {
 
 
