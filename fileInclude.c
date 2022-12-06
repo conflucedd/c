@@ -43,9 +43,5 @@ int main(int str_num, char * str_arg [])
 			put_in(in, getFile(in, include_pos[i]), temp);
 		}
 	}
-
-	mmm;
-	sww;
-
-
+	
 }
