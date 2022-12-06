@@ -45,6 +45,7 @@ int main(int str_num, char * str_arg [])
 	}
 
 	mmm;
+	sww;
 
 
 }
