@@ -185,22 +185,22 @@ void exist(char * laterword, char (*wordlist)[20], int word_num, int wordlist_lo
 	
 	bool found = false;
 	for (int r = 0; r < word_num; r++)
+    {
+        int s; // justify each word from the wordlist with the given string
+        for (s = 0; laterword[s] != '\0' && wordlist[r][s] != '\0'; s++)
         {
-                int s; // justify each word from the wordlist with the given string
-                for (s = 0; laterword[s] != '\0' && wordlist[r][s] != '\0'; s++)
-                {
-                    found = true;
-                    if (laterword[s] != wordlist[r][s])
-                    {
-                        found = false;
-                        break;
-                    }
-                }
-
-                if (wordlist_loc[r] == s - 1) // for loop feature
-                {
-                        result[r] = true;
-                }
+            found = true;
+            if (laterword[s] != wordlist[r][s])
+            {
+                found = false;
+                break;
+            }
         }
+
+         if (wordlist_loc[r] == s - 1) // for loop feature
+        {
+            result[r] = true;
+        }
+    }
 }
 
