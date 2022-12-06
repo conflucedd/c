@@ -7,7 +7,7 @@ int main(int str_num, char * str_arg [])
 {
 	FILE * in, * out;
 
-	if(str_num != 1) // read in
+	if(str_num != 1) // read in a
 	{
 		exit(1);
 	}
