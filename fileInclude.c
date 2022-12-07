@@ -7,7 +7,7 @@ bool process_complete = false;
 char * process(char *);
 
 int count_str(char *);
-void to_string(FILE *); // return char count
+char * to_string(FILE *);
 void to_file(char *);
 
 bool check_include(char *);
@@ -24,17 +24,17 @@ int main(int str_num, char * str_arg [])
 	{
 		exit(1);
 	}
-	if ((in = fopen(str_arg[1], "r") == NULL))
+	if ((in = fopen(str_arg[1], "r")) == NULL)
 	{
 		exit(2);
 	}
-	if ((out = fopen(outfile_name, "wx") == NULL))
+	if ((out = fopen(outfile_name, "wx")) == NULL)
 	{
 		exit(3);
 	}
 
 	char * input_str;
-	to_string(in, input_str);
+	input_str = to_string(in);
 	to_file(process(input_str));
 
 	if (fclose(in) != 0)
@@ -49,14 +49,15 @@ int main(int str_num, char * str_arg [])
 	return 0;
 }
 
-extern process_complete; // default false
+extern bool process_complete; // default false
 char * process(char * in_str)
 {
 	char * res_str;
+	char * temp;
 
 	if (check_include(in_str) == true && process_complete == false)
 	{
-		if ((char * temp = (char *) malloc(process_size(in_str) * sizeof char)) == NULL)
+		if ((temp = (char *) malloc(process_size(in_str) * sizeof(char))) == NULL)
 		{
 			exit(6);
 		}
@@ -72,10 +73,15 @@ char * process(char * in_str)
 	}
 }
 
-void to_string(FILE * in)
+char * to_string(FILE * in)
 {
 	int count = count_str(in);
-	char * 
+	char ch;
+	
+	for (long index = 0; (ch = getc(in) != EOF; index++)
+	{
+
+	}
 }
 
 char ch; // start to check
