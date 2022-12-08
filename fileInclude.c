@@ -13,10 +13,10 @@ long count_file_str(FILE *);
 char * to_string(FILE *);
 void to_file(char *, FILE *);
 
-bool check_include(char *, long * loc, char res [][20]);
+int check_include(char *, long * loc, char res [][20]);
 void put_in(char * in, char * out);
 
-void jump_blank(char * in, int * index);
+void jump_blank(char * in, long * index);
 
 int main(int str_num, char * str_arg [])
 {
@@ -63,10 +63,6 @@ char * process(char * in_str)
 
 	if (process_complete == false)
 	{
-		if ((temp = (char *) malloc(process_size(in_str) * sizeof(char))) == NULL)
-		{
-			exit(6);
-		}
 		put_in(in_str, temp);
 		free(in_str);
 		process(temp);
@@ -75,6 +71,8 @@ char * process(char * in_str)
 	{
 		return in_str;
 	}
+
+	return NULL;
 }
 
 
@@ -92,7 +90,7 @@ long count_file_str(FILE * in)
 
 char * to_string(FILE * in)
 {
-	int count = count_file_char(in);
+	int count = count_file_str(in);
 	char * ret_val = malloc(count * sizeof(char));
 	
 	char ch;
@@ -124,20 +122,17 @@ void put_in(char * in, char * out)
 	char res_name[10][20];
 	
 	count = check_include(in, pos, res_name); // at most 10 #include statement
-	char * res [count];
 	FILE * res_in [count];
 	for (int i = 0; i < count; i++)
 	{
 		res_in[i] = fopen(res_name[i], "r");
-		res[i] = malloc(count_file_str(in[i]) * sizeof(char));
 	}
 
 	long pos_pre[10];
-
+	int count_bet[10] = { 0 };
 	for (int i = 0; i < count; i++)
 	{
-		int count_bet = 0;
-		for (pos_pre[i] = pos[i]; pos_pre[i] >= 0 && in[i] != '\n'; pos_pre--, count_bet++)
+		for (pos_pre[i] = pos[i]; pos_pre[i] >= 0 && in[pos_pre[i]] != '\n'; pos_pre[i]--, count_bet[i]++)
 		{
 			continue;
 		}
@@ -146,11 +141,20 @@ void put_in(char * in, char * out)
 	int res_size_sum = 0;
 	for (int i = 0; i < count; i++)
 	{
-		res_size_sum += count_file_str(res_name[i]);
+		res_size_sum += count_file_str(res_in[i]);
+	}
+
+	int bet_sum = 0;
+	for (int i = 0; i < 10; i++)
+	{
+		bet_sum += count_bet[i];
 	}
 	
-	long process_size = (res_size_sum - count) + count_str(in) - (count_bet - 1);
-	out = malloc(process_size * sizeof(char));
+	long process_size = (res_size_sum - count) + count_str(in) - (bet_sum - count);
+	if ((out = malloc(process_size * sizeof(char))) == NULL)
+	{
+		exit(7);
+	}
 
 	for (int i = 0; i < count; i++)
 	{
@@ -158,20 +162,18 @@ void put_in(char * in, char * out)
 		{
 			out[j] = in[j];
 		}
-		for (int j = pos_pre[i] + 1; j < count_file_str(res[i]); j++)
+		for (int j = pos_pre[i] + 1; j < count_file_str(res_in[i]); j++)
 		{
-			out[j] = res[i][j];
+			out[j] = getc(res_in[i]);
 		}
-		for (int j = pos_pre[i] + count_file_str(res[i]) + 1; j <= process_size)
+		for (int j = pos_pre[i] + count_file_str(res_in[i]) + 1; j <= process_size; j++)
 		{
 			out[j] = in[j];
 		}
 	}
-
-	return out;
 }
 
-void jump_blank(char * in, int * index);
+void jump_blank(char * in, long * index)
 {
 	int index_2;
 	for (index_2 = 0; in[*index + index_2] != '\0' && isblank(in[*index + index_2]) == true; index_2++)
@@ -188,9 +190,9 @@ int check_include(char * in, long pos[], char res_name [][20]) // at most 19 cha
 
 	for (long index = 0; in[index] != '\0'; index++)
 	{
-		if (in[index] = '\n')
+		if (in[index] == '\n')
 		{
-			jump_blank(in, [&index]);
+			jump_blank(in, &index);
 		}
 
 		if (in[index] != '#')
@@ -199,7 +201,7 @@ int check_include(char * in, long pos[], char res_name [][20]) // at most 19 cha
 		}
 		
 		index++;
-		jump_blank[in, &index];
+		jump_blank(in, &index);
 
 		char temp_for_cmp[8] = { [7] = '\0' };
 		for (int i = 0; i < 7 && in[index] != EOF; i++, index++)
@@ -216,14 +218,14 @@ int check_include(char * in, long pos[], char res_name [][20]) // at most 19 cha
 			continue;
 		}
 
-		jump_blank[in, &index];
+		jump_blank(in, &index);
 
 		bool end = false;
 		bool end_std = true;
-		if (in[index] = '<')
+		if (in[index] == '<')
 		{
 			int index_2;
-			for (index_2 = 1; in[index] != '\0' && in[index] != '\n' && i < 18; index_2++, index++)
+			for (index_2 = 1; in[index] != '\0' && in[index] != '\n' && index_2 < 18; index_2++, index++)
 			{
 				if (in[index] != '>')
 				{
