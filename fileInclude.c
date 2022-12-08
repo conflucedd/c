@@ -2,17 +2,22 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <ctype.h>
 
 bool process_complete = false;
 char * process(char *);
 
-int count_str(char *);
+long count_str(char *);
+long count_file_str(FILE *);
+
 char * to_string(FILE *);
 void to_file(char *);
 
-bool check_include(char *);
+bool check_include(char *, long * loc);
 long process_size(char *);
-void put_in(char * in, char * out, fpos_t *);
+void put_in(char * in, char * out);
+
+void jump_blank(char * in, int * index);
 
 int main(int str_num, char * str_arg [])
 {
@@ -33,9 +38,12 @@ int main(int str_num, char * str_arg [])
 		exit(3);
 	}
 
-	char * input_str;
-	input_str = to_string(in);
-	to_file(process(input_str));
+	char * input_str = to_string(in);
+	char * output_str = process(input_str);
+	to_file(output_str);
+
+	free(input_str);
+	free(output_str);
 
 	if (fclose(in) != 0)
 	{
@@ -52,7 +60,6 @@ int main(int str_num, char * str_arg [])
 extern bool process_complete; // default false
 char * process(char * in_str)
 {
-	char * res_str;
 	char * temp;
 
 	if (check_include(in_str) == true && process_complete == false)
@@ -68,21 +75,82 @@ char * process(char * in_str)
 	else
 	{
 		process_complete = true;
-		res_str = temp;
-		return res_str;
+		return in_str;
 	}
+}
+
+
+long count_file_str(FILE * in)
+{
+	char ch;
+	long index;
+	for (index = 0; (ch = getc(in)) != EOF; index++)
+	{
+		continue;
+	}
+
+	return index; // include '\0' at end
 }
 
 char * to_string(FILE * in)
 {
-	int count = count_str(in);
-	char ch;
+	int count = count_file_char(in);
+	char * ret_val = malloc(count * sizeof(char));
 	
-	for (long index = 0; (ch = getc(in) != EOF; index++)
+	char ch;
+	long index;
+	for (index = 0; (ch = getc(in)) != EOF; index++)
 	{
+		ret_val[index] = ch;
+	}
+	ret_val[index] = '\0';
+
+	return ret_val;
+}
+
+long count_str(char * in)
+{
+	long index;
+	for (index = 0; in[index] != '\0'; index++)
+	{
+		continue;
+	}
+
+	return index; // include '\0'
+}
+
+void put_in(char * in, char * out)
+{
+	long * pos = check_include(in);
+	
+	
+}
+
+void jump_blank(char * in, int * index);
+{
+	int index_2;
+	for (index_2 = 1; in[*index + index_2] != EOF && isblank(in[*index + index_2]) == true; index_2++)
+	{
+	continue;
+	}
+	*index += index_2;
+}
+
+bool check_include(char * in, long * pos)
+{
+	for (long index = 0; in[index] != '\0'; index++)
+	{
+		if (in[index] = '\n')
+		{
+			jump_blank[&index];
+		}
+
+		
+
 
 	}
 }
+
 
 char ch; // start to check
 	fpos_t include_pos [100]; int incpos_index = 0;
