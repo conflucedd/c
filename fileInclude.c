@@ -24,7 +24,7 @@ int main(int str_num, char * str_arg [])
 	FILE * out;
 	
 	char * outfile_name = strcat(str_arg[1], "_with_incl");
-	if(str_num != 1) // read in
+	if(str_num != 2) // read in
 	{
 		exit(1);
 	}
