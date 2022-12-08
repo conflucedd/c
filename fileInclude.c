@@ -61,7 +61,7 @@ char * process(char * in_str)
 {
 	char * temp;
 
-	if (check_include(in_str) == true && process_complete == false)
+	if (process_complete == false)
 	{
 		if ((temp = (char *) malloc(process_size(in_str) * sizeof(char))) == NULL)
 		{
@@ -73,7 +73,6 @@ char * process(char * in_str)
 	}
 	else
 	{
-		process_complete = true;
 		return in_str;
 	}
 }
@@ -182,6 +181,7 @@ void jump_blank(char * in, int * index);
 	*index += index_2;
 }
 
+extern bool process_complete; // default false
 int check_include(char * in, long pos[], char res_name [][20]) // at most 19 char file name
 {
 	int count = -1; // will start from 0 because of ++
@@ -255,7 +255,12 @@ int check_include(char * in, long pos[], char res_name [][20]) // at most 19 cha
 		}
 	}
 
-	return count;
+	if (count == -1)
+	{
+		process_complete = true;
+	}
+
+	return (count + 1);
 }
 
 void to_file(char * in, FILE * out)
