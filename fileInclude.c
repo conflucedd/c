@@ -13,7 +13,7 @@ long count_file_str(FILE *);
 char * to_string(FILE *);
 void to_file(char *);
 
-bool check_include(char *, long * loc);
+bool check_include(char *, long * loc, char (* res) [20]);
 long process_size(char *);
 void put_in(char * in, char * out);
 
@@ -129,26 +129,84 @@ void put_in(char * in, char * out)
 void jump_blank(char * in, int * index);
 {
 	int index_2;
-	for (index_2 = 1; in[*index + index_2] != EOF && isblank(in[*index + index_2]) == true; index_2++)
+	for (index_2 = 0; in[*index + index_2] != '\0' && isblank(in[*index + index_2]) == true; index_2++)
 	{
-	continue;
+		continue;
 	}
 	*index += index_2;
 }
 
-bool check_include(char * in, long * pos)
+bool check_include(char * in, long * pos, char (* res) [8])
 {
+	bool ret_val = false;
+	int res_index = -1; // will start from 0 because of ++
+
 	for (long index = 0; in[index] != '\0'; index++)
 	{
 		if (in[index] = '\n')
 		{
-			jump_blank[&index];
+			jump_blank(in, [&index]);
 		}
 
+		if (in[index] != '#')
+		{
+			continue;
+		}
 		
+		index++;
+		jump_blank[in, &index];
 
+		char temp_for_cmp[8] = { [7] = '\0' };
+		for (int i = 0; i < 7 && in[index] != EOF; i++, index++)
+		{
+			temp_for_cmp[i] = in[index];
+		}
+		if(strcmp(temp_for_cmp, "include") == 0)
+		{
+			count++;
+			index += 7;
+		}
+		else
+		{
+			continue;
+		}
 
+		jump_blank[in, &index];
+
+		bool end = false;
+		bool end_std = true;
+		if (in[index] = '<')
+		{
+			int index_2;
+			for (index_2 = 1; in[index] != '\0' && in[index] != '\n' && i < 18; index_2++, index++)
+			{
+				if (in[index] != '>')
+				{
+					res[count][index_2] = in[index];
+				}
+				if (in[index] == '>')
+				{
+					end = true;
+				}
+			}
+			res[count][index_2] = '\0';
+
+			for (int i = 0; in[index] != '\0' && in[index] != '\n'; i++, index++)
+			{
+				if (isblank(in[index] == false))
+				{
+					end_std = false;
+				}
+			}
+		}
+
+		if ((end && end_std) != true)
+		{
+			count--;
+		}
 	}
+
+	return ret_val;
 }
 
 
