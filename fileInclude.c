@@ -4,9 +4,9 @@
 #include <stdbool.h>
 #include <ctype.h>
 
-#define INPUT_FILE_NAME_LENGTH 50
+#define INPUT_FILE_NAME_LENGTH 50 // not include '\0'
 #define RSC_NUM 10
-#define RSC_NAME_LEN 50
+#define RSC_NAME_LEN 50 // not include '\0'
 
 bool process_complete = false;
 char * process(char *);
@@ -17,7 +17,7 @@ long count_file_str(FILE *);
 char * to_string(FILE *);
 void to_file(const char *, FILE *);
 
-int check_include(const char *, long * loc, char res [][RSC_NAME_LEN]);
+int check_include(const char *, long * loc, char res [][RSC_NAME_LEN + 1]);
 void put_in(const char * in, char ** out); // malloc for *out
 
 void jump_blank(const char * in, long * index);
@@ -27,8 +27,8 @@ int main(const int str_num, char * str_arg [])
 	FILE * in;
 	FILE * out;
 	
-	char outfile_name[30];
-	strncpy(outfile_name, str_arg[1], 19);
+	char outfile_name[INPUT_FILE_NAME_LENGTH + 10]; // 10 is the char num of "_with_incl"
+	strncpy(outfile_name, str_arg[1], RSC_NAME_LEN);
 	strcat(outfile_name, "_with_incl");
 	if(str_num != 2) // read in
 	{
@@ -126,8 +126,8 @@ long count_str(const char * in) // do not include '\0'
 void put_in(const char * in, char ** out) // will malloc mem for *out
 {
 	int count;
-	long pos[RSC_NUM + 1]; // pos is the position of the last character : '\0' or '\n', index add one for later comparison
-	char res_name[RSC_NUM][RSC_NAME_LEN];
+	long pos[RSC_NUM]; // pos is the position of the last character : '\0' or '\n'
+	char res_name[RSC_NUM][RSC_NAME_LEN + 1];
 	
 	count = check_include(in, pos, res_name);
 	if (count == 0)
@@ -148,7 +148,7 @@ void put_in(const char * in, char ** out) // will malloc mem for *out
 	}
 
 	
-	long pos_pre[RSC_NUM + 1]; // pos_pre is the position of the firest chat in the current line, index add one for later manipulation
+	long pos_pre[RSC_NUM]; // pos_pre is the position of the firest chat in the current line
 	int count_bet[RSC_NUM]; // count_bet is the current line char num
 
 	for (int i = 0; i < count; i++)
@@ -187,7 +187,6 @@ void put_in(const char * in, char ** out) // will malloc mem for *out
 		exit(7);
 	}
 
-	pos[count] = process_size; // mark the last pos for later namipulation
 	for (int i = 0; i < count; i++)
 	{
 		long out_index = 0;
@@ -217,7 +216,7 @@ void jump_blank(const char * in, long * index) // post it to the first non-blank
 }
 
 extern bool process_complete; // default false
-int check_include(const char * in, long pos[], char res_name [][RSC_NAME_LEN])
+int check_include(const char * in, long pos[], char res_name [][RSC_NAME_LEN + 1])
 {
 	int count = -1; // will start from 0 because of ++
 
