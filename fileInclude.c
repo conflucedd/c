@@ -190,21 +190,19 @@ void put_in(const char * in, char ** out) // will malloc mem for *out
 	pos[count] = process_size; // mark the last pos for later namipulation
 	for (int i = 0; i < count; i++)
 	{
-		for (int j = 0; j < pos_pre[i]; j++)
+		long out_index = 0;
+		for (long in_index = 0; in_index < pos_pre[i], out_index < pos_pre[i], in_index++, out_index++)
 		{
-			(*out)[j] = in[j];
+			(*out)[out_index] = in[in_index];
 		}
-		for (int j = pos_pre[i]; j <= pos_pre[i] + res_size[i]; j++)
+		for (long in_index = 0; in_index < res_size[i]; in_index++, out_index++) // add include file
 		{
-			(*out)[j] = getc(res_in[i]);
+			(*out)[out_index] = getc(res_in[i]);
 		}
-		for (int j = pos_pre[i] + res_size[i] + 1; j <= process_size; j++) // make j to process_size is not accurate
+		for (long in_index = pos[i]; in_index <= count_str(in); in_index++, out_index++) // use <= because of '\0' at end the out string
 		{
-			(*out)[j] = in[j];
+			(*out)[out_index] = in[in_index];
 		}
-
-		pos[i + 1] += res_size[i] - count_bet[i];
-		pos_pre[i + 1] += res_size[i] - count_bet[i];
 	}
 }
 
