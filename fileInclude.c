@@ -191,7 +191,7 @@ void put_in(const char * in, char ** out) // will malloc mem for *out
 	for (int i = 0; i < count; i++)
 	{
 		long out_index = 0;
-		for (long in_index = 0; in_index < pos_pre[i], out_index < pos_pre[i], in_index++, out_index++)
+		for (long in_index = 0; in_index < pos_pre[i] && out_index < pos_pre[i]; in_index++, out_index++)
 		{
 			(*out)[out_index] = in[in_index];
 		}
@@ -199,7 +199,7 @@ void put_in(const char * in, char ** out) // will malloc mem for *out
 		{
 			(*out)[out_index] = getc(res_in[i]);
 		}
-		for (long in_index = pos[i]; in_index <= count_str(in); in_index++, out_index++) // use <= because of '\0' at end the out string
+		for (long in_index = pos[i]; in_index <= count_str(in); in_index++, out_index++) // use pos[i] for the '\n'; use <= because of '\0' at end the out string
 		{
 			(*out)[out_index] = in[in_index];
 		}
