@@ -23,7 +23,8 @@ int main(const int str_num, char * str_arg [])
 	FILE * in;
 	FILE * out;
 	
-	char * outfile_name = strcat(str_arg[1], "_with_incl");
+	char * outfile_name = "ggggggg";
+	//char * outfile_name = strcat(str_arg[1], "_with_incl");
 	if(str_num != 2) // read in
 	{
 		exit(1);
