@@ -5,7 +5,7 @@
 #include <ctype.h>
 
 #define INPUT_FILE_NAME_LENGTH 50 // not include '\0'
-#define RSC_NUM 10
+#define RSC_NUM 1000
 #define RSC_NAME_LEN 50 // not include '\0'
 
 bool process_complete = false;
