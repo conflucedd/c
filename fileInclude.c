@@ -7,18 +7,18 @@
 bool process_complete = false;
 char * process(char *);
 
-long count_str(char *);
+long count_str(const char *);
 long count_file_str(FILE *);
 
 char * to_string(FILE *);
-void to_file(char *, FILE *);
+void to_file(const char *, FILE *);
 
-int check_include(char *, long * loc, char res [][20]);
-void put_in(const char * in, char * out);
+int check_include(const char *, long * loc, char res [][20]);
+void put_in(const char * in, char ** out);
 
-void jump_blank(char * in, long * index);
+void jump_blank(const char * in, long * index);
 
-int main(int str_num, char * str_arg [])
+int main(const int str_num, char * str_arg [])
 {
 	FILE * in;
 	FILE * out;
@@ -63,7 +63,7 @@ char * process(char * in_str)
 
 	if (process_complete == false)
 	{
-		put_in(in_str, temp);
+		put_in(in_str, &temp);
 		free(in_str);
 		process(temp);
 	}
@@ -109,7 +109,7 @@ char * to_string(FILE * in)
 	return ret_val;
 }
 
-long count_str(char * in)
+long count_str(const char * in)
 {
 	long index;
 	for (index = 0; in[index] != '\0'; index++)
@@ -159,7 +159,7 @@ void put_in(const char * in, char ** out) // will malloc mem for *out
 	}
 	
 	long process_size = (res_size_sum - count) + count_str(in) - (bet_sum - count);
-	if ((out = malloc(process_size * sizeof(char))) == NULL)
+	if ((*out = malloc(process_size * sizeof(char))) == NULL)
 	{
 		exit(7);
 	}
@@ -169,20 +169,20 @@ void put_in(const char * in, char ** out) // will malloc mem for *out
 		long count_temp = count_file_str(res_in[i]);
 		for (int j = 0; j <= pos_pre[i]; j++)
 		{
-			out[j] = in[j];
+			(*out)[j] = in[j];
 		}
 		for (int j = pos_pre[i] + 1; j < count_temp; j++)
 		{
-			out[j] = getc(res_in[i]);
+			(*out)[j] = getc(res_in[i]);
 		}
 		for (int j = pos_pre[i] + count_temp + 1; j <= process_size; j++)
 		{
-			out[j] = in[j];
+			(*out)[j] = in[j];
 		}	
 	}
 }
 
-void jump_blank(char * in, long * index)
+void jump_blank(const char * in, long * index)
 {
 	int index_2;
 	for (index_2 = 0; in[*index + index_2] != '\0' && isblank(in[*index + index_2]) == true; index_2++)
@@ -193,7 +193,7 @@ void jump_blank(char * in, long * index)
 }
 
 extern bool process_complete; // default false
-int check_include(char * in, long pos[], char res_name [][20]) // at most 19 char file name
+int check_include(const char * in, long pos[], char res_name [][20]) // at most 19 char file name
 {
 	int count = -1; // will start from 0 because of ++
 
@@ -276,7 +276,7 @@ int check_include(char * in, long pos[], char res_name [][20]) // at most 19 cha
 	return (count + 1);
 }
 
-void to_file(char * in, FILE * out)
+void to_file(const char * in, FILE * out)
 {
 	for (long i = 0; in[i] != '\0'; i++)
 	{
