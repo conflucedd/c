@@ -14,7 +14,7 @@ char * to_string(FILE *);
 void to_file(const char *, FILE *);
 
 int check_include(const char *, long * loc, char res [][20]);
-void put_in(const char * in, char ** out);
+void put_in(const char * in, char ** out); // malloc for *out
 
 void jump_blank(const char * in, long * index);
 
@@ -23,8 +23,9 @@ int main(const int str_num, char * str_arg [])
 	FILE * in;
 	FILE * out;
 	
-	char * outfile_name = "ggggggg";
-	//char * outfile_name = strcat(str_arg[1], "_with_incl");
+	char outfile_name[30];
+	strncpy(outfile_name, str_arg[1], 19);
+	strcat(outfile_name, "_with_incl");
 	if(str_num != 2) // read in
 	{
 		exit(1);
@@ -42,7 +43,6 @@ int main(const int str_num, char * str_arg [])
 	char * output_str = process(input_str);
 	to_file(output_str, out);
 
-	free(input_str);
 	free(output_str);
 
 	if (fclose(in) != 0)
@@ -66,14 +66,12 @@ char * process(char * in_str)
 	{
 		put_in(in_str, &temp);
 		free(in_str);
-		process(temp);
+		return process(temp);
 	}
 	else
 	{
 		return in_str;
 	}
-
-	return NULL;
 }
 
 
@@ -128,6 +126,14 @@ void put_in(const char * in, char ** out) // will malloc mem for *out
 	char res_name[10][20];
 	
 	count = check_include(in, pos, res_name); // at most 10 #include statement
+	if (count == 0)
+	{
+		*out = malloc(count_str(in) * sizeof(char));
+		strcpy(*out, in);
+
+		return;
+	}
+
 	FILE * res_in [count];
 	for (int i = 0; i < count; i++)
 	{

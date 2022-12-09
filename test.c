@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 int main(void)
 {
-	FILE * in;
-	in = fopen("a", "rw");
-rewind(in);
+	char a[30] = "sgr";
+	printf("%zd", strlen(a));
 }
