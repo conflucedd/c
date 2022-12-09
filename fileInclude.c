@@ -23,22 +23,25 @@ int main(int str_num, char * str_arg [])
 	FILE * in;
 	FILE * out;
 	
+	char a[23];
+	strcpy(a, str_arg[1]);
 	char * outfile_name = strcat(str_arg[1], "_with_incl");
 	if(str_num != 2) // read in
 	{
 		exit(1);
 	}
-	if ((in = fopen(str_arg[1], "r")) == NULL)
+	if ((in = fopen("a", "r")) == NULL)
 	{
 		exit(2);
 	}
-	if ((out = fopen(outfile_name, "wx")) == NULL)
+	if ((out = fopen(outfile_name, "w")) == NULL)
 	{
 		exit(3);
 	}
 
 	char * input_str = to_string(in);
 	char * output_str = process(input_str);
+
 	to_file(output_str, out);
 
 	free(input_str);
@@ -267,8 +270,10 @@ int check_include(char * in, long pos[], char res_name [][20]) // at most 19 cha
 
 void to_file(char * in, FILE * out)
 {
-	for (long i = 0; in[i] != '\0'; i++)
+	for (long i = 0; in[i] != '\0'; 
+
+	)
 	{
-		putc(in[i], out);
+		putc(in[i], out);i++;
 	}
 }
