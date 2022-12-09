@@ -79,7 +79,7 @@ char * process(char * in_str)
 }
 
 
-long count_file_str(FILE * in)
+long count_file_str(FILE * in) // do not include EOF
 {
 	rewind(in);
 
@@ -92,7 +92,7 @@ long count_file_str(FILE * in)
 
 	rewind(in);
 
-	return index; // include '\0' at end
+	return index;
 }
 
 char * to_string(FILE * in)
@@ -112,7 +112,7 @@ char * to_string(FILE * in)
 	return ret_val;
 }
 
-long count_str(const char * in)
+long count_str(const char * in) // do not include '\0'
 {
 	long index;
 	for (index = 0; in[index] != '\0'; index++)
@@ -120,19 +120,19 @@ long count_str(const char * in)
 		continue;
 	}
 
-	return index; // include '\0'
+	return index;
 }
 
 void put_in(const char * in, char ** out) // will malloc mem for *out
 {
 	int count;
-	long pos[RSC_NUM];
+	long pos[RSC_NUM + 1]; // pos is the position of the last character : '\0' or '\n', index add one for later comparison
 	char res_name[RSC_NUM][RSC_NAME_LEN];
 	
-	count = check_include(in, pos, res_name); // at most 10 #include statement
+	count = check_include(in, pos, res_name);
 	if (count == 0)
 	{
-		*out = malloc(count_str(in) * sizeof(char));
+		*out = malloc(count_str(in) * sizeof(char)); // because of the free() in recycle of process()
 		strcpy(*out, in);
 
 		return;
@@ -148,66 +148,67 @@ void put_in(const char * in, char ** out) // will malloc mem for *out
 	}
 
 	
-	long pos_pre[RSC_NUM];
-	int count_bet[RSC_NUM];
-	for (int i = 0; i < 10; i++)
-	{
-		count_bet[i] = 1;
-	}
+	long pos_pre[RSC_NUM + 1]; // pos_pre is the position of the firest chat in the current line, index add one for later manipulation
+	int count_bet[RSC_NUM]; // count_bet is the current line char num
 
 	for (int i = 0; i < count; i++)
 	{
 		for (pos_pre[i] = pos[i] - 1; // - 1 because of current position is '\n' or '\0'
-			 pos_pre[i] >= 0 && in[pos_pre[i]] != '\n'; pos_pre[i]--, count_bet[i]++)
+				pos_pre[i] >= 0 && in[pos_pre[i]] != '\n';
+					pos_pre[i]--)
 		{
 			continue;
 		}
+		pos_pre[i]++; // for loop feature
+
+		count_bet[i] = pos[i] - pos_pre[i] + 1;
 	}
 
-	
-	int res_size_sum = 0;
+	long res_size[count];
 	for (int i = 0; i < count; i++)
 	{
-		res_size_sum += count_file_str(res_in[i]);
+		res_size[i] = count_file_str(res_in[i]);
+	}
+	long res_size_sum = 0;
+	for (int i = 0; i < count; i++)
+	{
+		res_size_sum += res_size[i];
 	}
 
 	int bet_sum = 0;
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < count; i++)
 	{
 		bet_sum += count_bet[i];
 	}
 	
-	long process_size = (res_size_sum - count) + count_str(in) - (bet_sum - count);
+	long process_size =  count_str(in) - bet_sum + res_size_sum + 1; // + 1 because of the '\0' at the end
 	if ((*out = malloc(process_size * sizeof(char))) == NULL)
 	{
 		exit(7);
 	}
 
+	pos[count] = process_size; // mark the last pos for later namipulation
 	for (int i = 0; i < count; i++)
 	{
-		long count_temp = count_file_str(res_in[i]);
-		for (int j = 0; j <= pos_pre[i]; j++)
+		for (int j = 0; j < pos_pre[i]; j++)
 		{
 			(*out)[j] = in[j];
 		}
-		for (int j = pos_pre[i] + 1; j <= pos_pre[i] - count_bet[i] + count_temp; j++)
+		for (int j = pos_pre[i]; j <= pos_pre[i] + res_size[i]; j++)
 		{
 			(*out)[j] = getc(res_in[i]);
 		}
-		for (int j = pos_pre[i] - count_bet[i] + count_temp + 1; j <= pos_pre[i + 1]; j++)
+		for (int j = pos_pre[i] + res_size[i] + 1; j <= process_size; j++) // make j to process_size is not accurate
 		{
 			(*out)[j] = in[j];
 		}
 
-		for (int j = i + 1; j < count; j++)
-		{
-			pos[i] += count_temp - count_bet[i];
-			pos_pre[i] += count_temp - count_bet[i];
-		}
+		pos[i + 1] += res_size[i] - count_bet[i];
+		pos_pre[i + 1] += res_size[i] - count_bet[i];
 	}
 }
 
-void jump_blank(const char * in, long * index)
+void jump_blank(const char * in, long * index) // post it to the first non-blank or '\0' (current position must be blank)
 {
 	int index_2;
 	for (index_2 = 0; in[*index + index_2] != '\0' && isblank(in[*index + index_2]) == true; index_2++)
@@ -218,7 +219,7 @@ void jump_blank(const char * in, long * index)
 }
 
 extern bool process_complete; // default false
-int check_include(const char * in, long pos[], char res_name [][20]) // at most 19 char file name
+int check_include(const char * in, long pos[], char res_name [][RSC_NAME_LEN])
 {
 	int count = -1; // will start from 0 because of ++
 
@@ -234,11 +235,11 @@ int check_include(const char * in, long pos[], char res_name [][20]) // at most 
 			continue;
 		}
 		
-		index++;
+		index++; // go to first blank (if have)
 		jump_blank(in, &index);
 
 		char temp_for_cmp[8] = { [7] = '\0' };
-		for (int i = 0; i < 7 && in[index] != EOF; i++, index++)
+		for (int i = 0; i < 7 && in[index] != EOF; i++, index++) // have passed to the first char after include
 		{
 			temp_for_cmp[i] = in[index];
 		}
@@ -260,7 +261,7 @@ int check_include(const char * in, long pos[], char res_name [][20]) // at most 
 			index++;
 
 			int index_2;
-			for (index_2 = 0; in[index] != '\0' && in[index] != '\n' && index_2 < RSC_NUM; index_2++, index++)
+			for (index_2 = 0; in[index] != '\0' && in[index] != '\n' && index_2 < RSC_NAME_LEN; index_2++, index++) // index_2 have go after file name
 			{
 				if (in[index] != '>')
 				{
@@ -285,7 +286,7 @@ int check_include(const char * in, long pos[], char res_name [][20]) // at most 
 
 		if ((end && end_std) == true)
 		{
-			pos[count] = index;
+			pos[count] = index; // current position is '\n' or '\0' at current line last
 		}
 		else
 		{
