@@ -4,9 +4,9 @@
 #include <stdbool.h>
 #include <ctype.h>
 
-#define INPUT_FILE_NAME_LENGTH 20
+#define INPUT_FILE_NAME_LENGTH 50
 #define RSC_NUM 10
-#define RSC_NAME_LEN 20
+#define RSC_NAME_LEN 50
 
 bool process_complete = false;
 char * process(char *);
