@@ -14,7 +14,7 @@ char * to_string(FILE *);
 void to_file(char *, FILE *);
 
 int check_include(char *, long * loc, char res [][20]);
-void put_in(char * in, char * out);
+void put_in(const char * in, char * out);
 
 void jump_blank(char * in, long * index);
 
@@ -23,8 +23,6 @@ int main(int str_num, char * str_arg [])
 	FILE * in;
 	FILE * out;
 	
-	char a[23];
-	strcpy(a, str_arg[1]);
 	char * outfile_name = strcat(str_arg[1], "_with_incl");
 	if(str_num != 2) // read in
 	{
@@ -41,7 +39,6 @@ int main(int str_num, char * str_arg [])
 
 	char * input_str = to_string(in);
 	char * output_str = process(input_str);
-
 	to_file(output_str, out);
 
 	free(input_str);
@@ -81,6 +78,8 @@ char * process(char * in_str)
 
 long count_file_str(FILE * in)
 {
+	rewind(in);
+
 	char ch;
 	long index;
 	for (index = 0; (ch = getc(in)) != EOF; index++)
@@ -88,16 +87,19 @@ long count_file_str(FILE * in)
 		continue;
 	}
 
+	rewind(in);
+
 	return index; // include '\0' at end
 }
 
 char * to_string(FILE * in)
 {
-	int count = count_file_str(in);
+	long count = count_file_str(in);
 	char * ret_val = malloc(count * sizeof(char));
 	
 	char ch;
 	long index;
+
 	for (index = 0; (ch = getc(in)) != EOF; index++)
 	{
 		ret_val[index] = ch;
@@ -118,7 +120,7 @@ long count_str(char * in)
 	return index; // include '\0'
 }
 
-void put_in(char * in, char * out)
+void put_in(const char * in, char ** out) // will malloc mem for *out
 {
 	int count;
 	long pos[10];
@@ -128,7 +130,10 @@ void put_in(char * in, char * out)
 	FILE * res_in [count];
 	for (int i = 0; i < count; i++)
 	{
-		res_in[i] = fopen(res_name[i], "r");
+		if ((res_in[i] = fopen(res_name[i], "r")) == NULL)
+		{
+			exit(6);
+		}
 	}
 
 	long pos_pre[10];
@@ -161,18 +166,19 @@ void put_in(char * in, char * out)
 
 	for (int i = 0; i < count; i++)
 	{
+		long count_temp = count_file_str(res_in[i]);
 		for (int j = 0; j <= pos_pre[i]; j++)
 		{
 			out[j] = in[j];
 		}
-		for (int j = pos_pre[i] + 1; j < count_file_str(res_in[i]); j++)
+		for (int j = pos_pre[i] + 1; j < count_temp; j++)
 		{
 			out[j] = getc(res_in[i]);
 		}
-		for (int j = pos_pre[i] + count_file_str(res_in[i]) + 1; j <= process_size; j++)
+		for (int j = pos_pre[i] + count_temp + 1; j <= process_size; j++)
 		{
 			out[j] = in[j];
-		}
+		}	
 	}
 }
 
@@ -214,7 +220,6 @@ int check_include(char * in, long pos[], char res_name [][20]) // at most 19 cha
 		if(strcmp(temp_for_cmp, "include") == 0)
 		{
 			count++;
-			index += 7;
 		}
 		else
 		{
@@ -227,8 +232,10 @@ int check_include(char * in, long pos[], char res_name [][20]) // at most 19 cha
 		bool end_std = true;
 		if (in[index] == '<')
 		{
+			index++;
+
 			int index_2;
-			for (index_2 = 1; in[index] != '\0' && in[index] != '\n' && index_2 < 18; index_2++, index++)
+			for (index_2 = 0; in[index] != '\0' && in[index] != '\n' && index_2 < 19; index_2++, index++)
 			{
 				if (in[index] != '>')
 				{
@@ -237,6 +244,7 @@ int check_include(char * in, long pos[], char res_name [][20]) // at most 19 cha
 				if (in[index] == '>')
 				{
 					end = true;
+					break;
 				}
 			}
 			res_name[count][index_2] = '\0';
@@ -270,10 +278,8 @@ int check_include(char * in, long pos[], char res_name [][20]) // at most 19 cha
 
 void to_file(char * in, FILE * out)
 {
-	for (long i = 0; in[i] != '\0'; 
-
-	)
+	for (long i = 0; in[i] != '\0'; i++)
 	{
-		putc(in[i], out);i++;
+		putc(in[i], out);
 	}
 }

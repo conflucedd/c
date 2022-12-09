@@ -3,8 +3,6 @@
 int main(void)
 {
 	FILE * in;
-	if ((in = fopen("a", "r")) == NULL)
-	{
-		exit(1);
-	}
+	in = fopen("a", "rw");
+rewind(in);
 }
