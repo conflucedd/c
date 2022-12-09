@@ -34,7 +34,7 @@ int main(const int str_num, char * str_arg [])
 	{
 		exit(1);
 	}
-	if ((in = fopen("a", "r")) == NULL)
+	if ((in = fopen(str_arg[1], "r")) == NULL)
 	{
 		exit(2);
 	}
