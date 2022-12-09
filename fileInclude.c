@@ -4,6 +4,10 @@
 #include <stdbool.h>
 #include <ctype.h>
 
+#define INPUT_FILE_NAME_LENGTH 20
+#define RSC_NUM 10
+#define RSC_NAME_LEN 20
+
 bool process_complete = false;
 char * process(char *);
 
@@ -13,7 +17,7 @@ long count_file_str(FILE *);
 char * to_string(FILE *);
 void to_file(const char *, FILE *);
 
-int check_include(const char *, long * loc, char res [][20]);
+int check_include(const char *, long * loc, char res [][RSC_NAME_LEN]);
 void put_in(const char * in, char ** out); // malloc for *out
 
 void jump_blank(const char * in, long * index);
@@ -122,8 +126,8 @@ long count_str(const char * in)
 void put_in(const char * in, char ** out) // will malloc mem for *out
 {
 	int count;
-	long pos[10];
-	char res_name[10][20];
+	long pos[RSC_NUM];
+	char res_name[RSC_NUM][RSC_NAME_LEN];
 	
 	count = check_include(in, pos, res_name); // at most 10 #include statement
 	if (count == 0)
@@ -143,16 +147,24 @@ void put_in(const char * in, char ** out) // will malloc mem for *out
 		}
 	}
 
-	long pos_pre[10];
-	int count_bet[10] = { 0 };
+	
+	long pos_pre[RSC_NUM];
+	int count_bet[RSC_NUM];
+	for (int i = 0; i < 10; i++)
+	{
+		count_bet[i] = 1;
+	}
+
 	for (int i = 0; i < count; i++)
 	{
-		for (pos_pre[i] = pos[i]; pos_pre[i] >= 0 && in[pos_pre[i]] != '\n'; pos_pre[i]--, count_bet[i]++)
+		for (pos_pre[i] = pos[i] - 1; // - 1 because of current position is '\n' or '\0'
+			 pos_pre[i] >= 0 && in[pos_pre[i]] != '\n'; pos_pre[i]--, count_bet[i]++)
 		{
 			continue;
 		}
 	}
 
+	
 	int res_size_sum = 0;
 	for (int i = 0; i < count; i++)
 	{
@@ -178,14 +190,20 @@ void put_in(const char * in, char ** out) // will malloc mem for *out
 		{
 			(*out)[j] = in[j];
 		}
-		for (int j = pos_pre[i] + 1; j < count_temp; j++)
+		for (int j = pos_pre[i] + 1; j <= pos_pre[i] - count_bet[i] + count_temp; j++)
 		{
 			(*out)[j] = getc(res_in[i]);
 		}
-		for (int j = pos_pre[i] + count_temp + 1; j <= process_size; j++)
+		for (int j = pos_pre[i] - count_bet[i] + count_temp + 1; j <= pos_pre[i + 1]; j++)
 		{
 			(*out)[j] = in[j];
-		}	
+		}
+
+		for (int j = i + 1; j < count; j++)
+		{
+			pos[i] += count_temp - count_bet[i];
+			pos_pre[i] += count_temp - count_bet[i];
+		}
 	}
 }
 
@@ -242,7 +260,7 @@ int check_include(const char * in, long pos[], char res_name [][20]) // at most 
 			index++;
 
 			int index_2;
-			for (index_2 = 0; in[index] != '\0' && in[index] != '\n' && index_2 < 19; index_2++, index++)
+			for (index_2 = 0; in[index] != '\0' && in[index] != '\n' && index_2 < RSC_NUM; index_2++, index++)
 			{
 				if (in[index] != '>')
 				{
