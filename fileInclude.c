@@ -24,8 +24,6 @@ void jump_blank(const char * in, long * index);
 
 int main(const int str_num, char * str_arg [])
 {
-
-
 // set variables and open files
 	FILE * in;
 	FILE * out;
@@ -84,7 +82,6 @@ char * process(char * in_str)
 	}
 }
 
-
 long count_file_str(FILE * in) // do not include EOF
 {
 	rewind(in);
@@ -130,8 +127,6 @@ long count_str(const char * in) // do not include '\0'
 
 void put_in(const char * in, char ** out) // will malloc mem for *out
 {
-	
-
 // open the include_rsc_file
 	int count;
 	long pos[RES_NUM_LIM]; // pos is the position of the last character : '\0' or '\n'
@@ -212,8 +207,6 @@ void put_in(const char * in, char ** out) // will malloc mem for *out
 			(*out)[out_index] = in[in_index];
 		}
 	}
-
-
 }
 
 void jump_blank(const char * in, long * index) // post it to the first non-blank or '\0' (current position must be blank)
@@ -233,8 +226,6 @@ int check_include(const char * in, long pos[], char res_name [][RES_NAME_LEN_LIM
 
 	for (long index = 0; in[index] != '\0'; index++)
 	{
-
-
 	// check "#include
 		if (in[index] == '\n')
 		{
