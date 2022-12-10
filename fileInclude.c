@@ -148,8 +148,7 @@ void put_in(const char * in, char ** out) // will malloc mem for *out
 	}
 
 	
-	long pos_pre[RSC_NUM]; // pos_pre is the position of the firest chat in the current line
-	int count_bet[RSC_NUM]; // count_bet is the current line char num
+	long pos_pre[RSC_NUM + 1]; // pos_pre is the position of the firest chat in the current line
 
 	for (int i = 0; i < count; i++)
 	{
@@ -160,9 +159,8 @@ void put_in(const char * in, char ** out) // will malloc mem for *out
 			continue;
 		}
 		pos_pre[i]++; // for loop feature
-
-		count_bet[i] = pos[i] - pos_pre[i] + 1;
 	}
+	pos_pre[count] = count_str(in) + 2; // define this for later comparison, to print the last thing in "in", +2 because of '\0' and the for loop feature
 
 	long res_size[count];
 	for (int i = 0; i < count; i++)
@@ -174,11 +172,11 @@ void put_in(const char * in, char ** out) // will malloc mem for *out
 	{
 		res_size_sum += res_size[i];
 	}
-
-	int bet_sum = 0;
+	
+	int bet_sum = 0; // bet_sum is the num of char being deleted
 	for (int i = 0; i < count; i++)
 	{
-		bet_sum += count_bet[i];
+		bet_sum += pos[i] - pos_pre[i];
 	}
 	
 	long process_size =  count_str(in) - bet_sum + res_size_sum + 1; // + 1 because of the '\0' at the end
@@ -186,19 +184,20 @@ void put_in(const char * in, char ** out) // will malloc mem for *out
 	{
 		exit(7);
 	}
-
-	for (int i = 0; i < count; i++)
+	
+	
+	long out_index = 0;
+	for (long in_index = 0 ; in_index < pos_pre[0]; in_index++, out_index++) // print thing before the first res_file
 	{
-		long out_index = 0;
-		for (long in_index = 0; in_index < pos_pre[i] && out_index < pos_pre[i]; in_index++, out_index++)
-		{
-			(*out)[out_index] = in[in_index];
-		}
-		for (long in_index = 0; in_index < res_size[i]; in_index++, out_index++) // add include file
+		(*out)[out_index] = in[in_index];
+	}
+	for (int i = 0; i < count; i++) // print later things
+	{		
+		for (long res_index = 0; res_index < res_size[i]; res_index++, out_index++) // add i-th include file
 		{
 			(*out)[out_index] = getc(res_in[i]);
 		}
-		for (long in_index = pos[i]; in_index <= count_str(in); in_index++, out_index++) // use pos[i] for the '\n'; use <= because of '\0' at end the out string
+		for (long in_index = pos[i]; in_index < pos_pre[i + 1]; in_index++, out_index++) // use pos[i] for the '\n'; use <= because of '\0' at end the out string
 		{
 			(*out)[out_index] = in[in_index];
 		}
