@@ -156,7 +156,7 @@ void put_in(const char * in, char ** out) // will malloc mem for *out
 	}
 
 
-// calculateand set needed values; malloc mem for *out
+// calculate and set needed values; malloc mem for *out
 	long pos_pre[count + 1]; // pos_pre is the position of the firest char in the current line
 	for (int i = 0; i < count; i++)
 	{
