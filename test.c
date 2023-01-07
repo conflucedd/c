@@ -47,3 +47,5 @@ bool if_diff(int input, int * array, int input_index)
 
 	return true;
 }
+
+ddf;
