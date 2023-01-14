@@ -3,8 +3,11 @@
 #include <stdbool.h>
 #include <time.h>
 
+#define N 81920000
+
 void swap(int *, int *);
 
+int a[N];
 int main(void)
 {
 // set rand seed
@@ -12,10 +15,10 @@ int main(void)
 
 
 // set and initialize variables
-	int N;
-	scanf("%d", &N);
+/* 	int N;
+	scanf("%d", &N); */
 
-	int a[N];
+	
 	for (int i = 0; i < N; i++)
 	{
 		a[i] = i + 1;
@@ -30,10 +33,10 @@ int main(void)
 
 
 // print result
-	for (int i = 0; i < N; i++)
+/* 	for (int i = 0; i < N; i++)
 	{
 		printf("%d\n", a[i]);
-	}
+	} */
 
 
 	return 0;
