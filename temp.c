@@ -25,11 +25,11 @@ int search(int source[N], int start, int end)
 {
 	int mid = (start + end) / 2;
 
-	if (a[mid] == mid)
+	if (source[mid] == mid)
 	{
 		return mid;
 	}
-	else if (a[mid] > mid)
+	else if (source[mid] > mid)
 	{
 		return search(source, start, mid - 1);
 	}
